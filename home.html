@@ -38,6 +38,7 @@
     );
 document.getElementById("photo-upload").addEventListener("change", async (event) => {
   const file = event.target.files[0];
+  alert("Bilden har valts!");
   if (!file) return;
 
   if (!file.type.startsWith("image/")) {
