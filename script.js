@@ -1,10 +1,9 @@
 
 const SUPABASE_URL = "https://dmuomeeuriqlayyuwrim.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_MSdBBcMSPa8a6g3cTPFEWw_uUOOeigD;
+const SUPABASE_ANON_KEY = "sb_publishable_MSdBBcMSPa8a6g3cTPFEWw_uUOOeigD";
 
 const supabaseClient = window.supabase.createClient(
   SUPABASE_URL,
-  const SUPABASE_ANON_KEY = "DIN_BEHÅLLNA_PUBLISHABLE_KEY";
 
 async function signUp(email, password, username) {
   const { data, error } = await supabaseClient.auth.signUp({
