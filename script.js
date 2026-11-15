@@ -52,4 +52,22 @@ async function signOut() {
   if (error) alert(error.message);
   else alert("Du är utloggad!");
 }
+document.getElementById("signup-btn").addEventListener("click", () => {
+  const username = document.getElementById("username").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
 
+  if (!username || !email || !password) {
+    alert("Fyll i alla fält!");
+    return;
+  }
+
+  signUp(email, password, username);
+});
+
+document.getElementById("login-btn").addEventListener("click", () => {
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+
+  signIn(email, password);
+});
