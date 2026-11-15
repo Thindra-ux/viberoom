@@ -14,15 +14,23 @@
     <a class="login" href="#join">Logga in</a>
   </header>
 
-  <main>
-    <section class="hero">
-      <div class="eyebrow"><span></span> DIN PLATS PÅ NÄTET</div>
-      <h1>Hitta din <span>vibe.</span><br>Hitta ditt folk.</h1>
-      <p>En plats att prata, dela intressen och lära känna nya människor – på ett schysst och tryggt sätt.</p>
-      <a class="primary" href="#join">Upptäck VibeRoom <span>→</span></a>
-      <div class="hero-note">Var snäll. Visa respekt. Var dig själv.</div>
-      <div class="orb orb-one"></div><div class="orb orb-two"></div>
-    </section>
+ <section class="join" id="join">
+  <div class="eyebrow">VIBEROOM COMMUNITY</div>
+  <h2>Välkommen till <span>VibeRoom.</span></h2>
+
+  <div class="auth-box">
+    <h3>Skapa konto</h3>
+    <input id="username" type="text" placeholder="Användarnamn">
+    <input id="email" type="email" placeholder="E-post">
+    <input id="password" type="password" placeholder="Lösenord">
+    <button id="signup-btn">Skapa konto</button>
+
+    <h3>Har du redan ett konto?</h3>
+    <button id="login-btn">Logga in</button>
+
+    <p id="auth-message"></p>
+  </div>
+</section>
 
     <section class="section" id="rooms">
       <div class="section-heading">
@@ -48,7 +56,8 @@
       <p>Vi vill att alla ska kunna delta utan press, mobbning eller oönskade meddelanden. Personlig information ska hållas privat och det ska gå att rapportera problem.</p>
     </section>
   </main>
-
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="script.js"></script>
   <footer><a class="brand" href="#"><span class="brand-mark">V</span> VibeRoom</a><span>YOUR SPACE. YOUR PEOPLE. YOUR VIBE.</span></footer>
   <script src="script.js"></script>
 </body>
