@@ -36,7 +36,45 @@
       SUPABASE_URL,
       SUPABASE_ANON_KEY
     );
+document.getElementById("photo-upload").addEventListener("change", async (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
 
+  if (!file.type.startsWith("image/")) {
+    alert("Välj en bildfil!");
+    return;
+  }
+
+  const { data: { user } } = await supabaseClient.auth.getUser();
+
+  if (!user) {
+    alert("Du måste vara inloggad!");
+    return;
+  }
+
+  const filePath = user.id + "/" + Date.now() + "-" + file.name;
+
+  const { error } = await supabaseClient.storage
+    .from("profile-photos")
+    .upload(filePath, file);
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
+
+  const { data, error: urlError } = await supabaseClient.storage
+    .from("profile-photos")
+    .createSignedUrl(filePath, 3600);
+
+  if (urlError) {
+    alert(urlError.message);
+    return;
+  }
+
+  document.getElementById("profile-photo").src = data.signedUrl;
+  alert("Profilbilden har laddats upp!");
+});
     async function loadProfile() {
       const { data: { user } } = await supabaseClient.auth.getUser();
 
