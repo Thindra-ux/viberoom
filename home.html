@@ -39,6 +39,7 @@
 document.getElementById("photo-upload").addEventListener("change", async (event) => {
   const file = event.target.files[0];
   alert("Bilden har valts!");
+  console.log("Uppladdningsfunktionen fungerar!");
   if (!file) return;
 
   if (!file.type.startsWith("image/")) {
@@ -55,20 +56,16 @@ document.getElementById("photo-upload").addEventListener("change", async (event)
 
   const filePath = user.id + "/" + Date.now() + "-" + file.name;
 
-  const { error } = await supabaseClient.storage
-    .from("profile-photos")
-    .upload(filePath, file);
+  const { data: uploadData, error } = await supabaseClient.storage
+  .from("profile-photos")
+  .upload(filePath, file);
 
-  if (error) {
-    alert(error.message);
-    return;
-  }
+if (error) {
+  alert("Uppladdningsfel: " + error.message);
+  return;
+}
 
-  const { data, error: urlError } = await supabaseClient.storage
-    .from("profile-photos")
-    .createSignedUrl(filePath, 3600);
-
-  if (urlError) {
+alert("Bilden laddades upp!");
     alert(urlError.message);
     return;
   }
