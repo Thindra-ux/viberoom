@@ -70,12 +70,19 @@ if (error) {
 }
 
 alert("Bilden laddades upp!");
-    alert(urlError.message);
-    return;
-  }
 
-  document.getElementById("profile-photo").src = data.signedUrl;
-  const { error: updateError } = await supabaseClient
+const { data, error: urlError } = await supabaseClient.storage
+  .from("profile-photos")
+  .createSignedUrl(filePath, 3600);
+
+if (urlError) {
+  alert(urlError.message);
+  return;
+}
+
+document.getElementById("profile-photo").src = data.signedUrl;
+
+const { error: updateError } = await supabaseClient
   .from("profiles")
   .update({ avatar_url: filePath })
   .eq("user_id", user.id);
@@ -84,9 +91,9 @@ if (updateError) {
   alert(updateError.message);
   return;
 }
-  alert("Profilbilden har laddats upp!");
+
+alert("Profilbilden har laddats upp!");
 });
-    async function loadRooms() {
   const list = document.getElementById("rooms-list");
 
   const { data, error } = await supabaseClient
