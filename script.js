@@ -4,68 +4,74 @@ const SUPABASE_ANON_KEY = "sb_publishable_MSdBBcMSPa8a6g3cTPFEWw_uUOOeigD";
 
 const supabaseClient = window.supabase.createClient(
   SUPABASE_URL,
+  SUPABASE_ANON_KEY
+);
 
-async function signUp(email, password, username) {
-  const { data, error } = await supabaseClient.auth.signUp({
-    email,
-    password
+document.addEventListener("DOMContentLoaded", () => {
+  const signupButton = document.getElementById("signup-btn");
+  const loginButton = document.getElementById("login-btn");
+
+  if (!signupButton || !loginButton) {
+    console.error("Registreringsknapparna hittades inte.");
+    return;
+  }
+
+  signupButton.addEventListener("click", async () => {
+    const username = document.getElementById("username").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+
+    if (!username || !email || !password) {
+      alert("Fyll i alla fält!");
+      return;
+    }
+
+    const { data, error } = await supabaseClient.auth.signUp({
+      email,
+      password
+    });
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    if (data.session && data.user) {
+      const { error: profileError } = await supabaseClient
+        .from("profiles")
+        .insert({
+          user_id: data.user.id,
+          username: username
+        });
+
+      if (profileError) {
+        alert(profileError.message);
+        return;
+      }
+    }
+
+    alert("Kontot har skapats! Kontrollera din e-post.");
   });
 
-  if (error) {
-    alert(error.message);
-    return;
-  }
+  loginButton.addEventListener("click", async () => {
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
 
-  if (data.user && data.session) {
-    const { error: profileError } = await supabaseClient
-      .from("profiles")
-      .insert({
-        user_id: data.user.id,
-        username: username
-      });
+    if (!email || !password) {
+      alert("Fyll i e-post och lösenord!");
+      return;
+    }
 
-    if (profileError) alert(profileError.message);
-  }
+    const { error } = await supabaseClient.auth.signInWithPassword({
+      email,
+      password
+    });
 
-  alert("Kontot har skapats! Kontrollera din e-post om du behöver bekräfta kontot.");
-}
+    if (error) {
+      alert(error.message);
+      return;
+    }
 
-async function signIn(email, password) {
-  const { error } = await supabaseClient.auth.signInWithPassword({
-    email,
-    password
+    alert("Du är inloggad!");
   });
-
-  if (error) {
-    alert(error.message);
-    return;
-  }
-
-  alert("Du är inloggad!");
-}
-
-async function signOut() {
-  const { error } = await supabaseClient.auth.signOut();
-
-  if (error) alert(error.message);
-  else alert("Du är utloggad!");
-}
-document.getElementById("signup-btn").addEventListener("click", () => {
-  const username = document.getElementById("username").value.trim();
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value;
-
-  if (!username || !email || !password) {
-    alert("Fyll i alla fält!");
-    return;
-  }
-
-  signUp(email, password, username);
-});
-
-document.getElementById("login-btn").addEventListener("click", () => {
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value;
-
-  signIn(email, password);
 });
