@@ -72,6 +72,6 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    alert("Du är inloggad!");
+    window.location.href = "home.html";
   });
 });
