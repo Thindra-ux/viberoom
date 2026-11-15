@@ -1,0 +1,66 @@
+
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VibeRoom – Home</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="topbar">
+    <h1>VibeRoom</h1>
+    <button id="logout-btn">Logga ut</button>
+  </header>
+
+  <main class="section">
+    <div class="eyebrow">YOUR SPACE. YOUR PEOPLE. YOUR VIBE.</div>
+    <h2>Välkommen till <span>VibeRoom.</span></h2>
+    <p>Du är inloggad!</p>
+
+    <div class="auth-box">
+      <h3>Din profil</h3>
+      <p id="profile-name">Laddar profil...</p>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = "https://dmuomeeuriqlayyuwrim.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_MSdBBcMSPa8a6g3cTPFEWw_uUOOeigD";
+
+    const supabaseClient = window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_ANON_KEY
+    );
+
+    async function loadProfile() {
+      const { data: { user } } = await supabaseClient.auth.getUser();
+
+      if (!user) {
+        window.location.href = "index.html";
+        return;
+      }
+
+      const { data, error } = await supabaseClient
+        .from("profiles")
+        .select("username")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      document.getElementById("profile-name").textContent =
+        error ? "Kunde inte ladda profilen." :
+        data ? "@" + data.username : "Välkommen!";
+    }
+
+    document.getElementById("logout-btn").addEventListener("click", async () => {
+      await supabaseClient.auth.signOut();
+      window.location.href = "index.html";
+    });
+
+    loadProfile();
+  </script>
+
+</body>
+</html>
