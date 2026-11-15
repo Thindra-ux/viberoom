@@ -87,17 +87,32 @@ if (updateError) {
   alert("Profilbilden har laddats upp!");
 });
     async function loadRooms() {
+  async function loadRooms() {
+  const list = document.getElementById("rooms-list");
+
   const { data, error } = await supabaseClient
     .from("rooms")
     .select("id, name, description")
     .order("created_at", { ascending: false });
 
-  const list = document.getElementById("rooms-list");
-
   if (error) {
-    list.textContent = "Kunde inte ladda chattrummen.";
+    list.textContent = "Fel: " + error.message;
     return;
   }
+
+  if (!data || data.length === 0) {
+    list.textContent = "Det finns inga chattrum ännu.";
+    return;
+  }
+
+  list.innerHTML = "";
+
+  data.forEach(room => {
+    const item = document.createElement("div");
+    item.textContent = room.name + " – " + (room.description || "");
+    list.appendChild(item);
+  });
+}
 
   if (!data || data.length === 0) {
     list.textContent = "Det finns inga chattrum ännu.";
