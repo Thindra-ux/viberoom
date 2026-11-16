@@ -108,7 +108,7 @@ document.getElementById("send-button").addEventListener("click", sendMessage);
 
   const { data, error } = await supabaseClient
     .from("messages")
-    .select("content, created_at")
+    .select("content, created_at, user_id")
     .eq("room_id", roomId)
     .order("created_at", { ascending: true });
 
