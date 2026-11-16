@@ -26,83 +26,41 @@
 <p id="message-status"></p>
     </div>
   </main>
-
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-  const SUPABASE_URL = "https://dmuomeeuriqlayyuwrim.supabase.co";
-  const SUPABASE_ANON_KEY = "sb_publishable_MSdBBcMSPa8a6g3cTPFEWw_uUOOeigD";
+const SUPABASE_URL = "https://dmuomeeuriqlayyuwrim.supabase.co";
+const SUPABASE_ANON_KEY = "DIN_PUBLISHABLE_KEY";
 
-  const supabaseClient = window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_ANON_KEY
-  );
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY
+);
 
-  async function loadRoom() {
-    const roomId = new URLSearchParams(window.location.search).get("room");
-
-    if (!roomId) {
-      document.getElementById("room-name").textContent =
-        "Inget chattrum valt.";
-      return;
-    }
-
-    const { data, error } = await supabaseClient
-      .from("rooms")
-      .select("name, description")
-      .eq("id", roomId)
-      .single();
-
-    if (error || !data) {
-      document.getElementById("room-name").textContent =
-        "Kunde inte hitta chattrummet.";
-      return;
-    }
-
-    document.getElementById("room-name").textContent = data.name;
-    document.getElementById("room-description").textContent =
-      data.description || "";
-  }
-
-  loadRoom();
-  
-async function loadMessages() {
-  
-async function sendMessage() {
+async function loadRoom() {
   const roomId = new URLSearchParams(window.location.search).get("room");
-  const input = document.getElementById("message-input");
-  const content = input.value.trim();
 
-  if (!content) return;
-
-  const { data: { user } } = await supabaseClient.auth.getUser();
-
-  if (!user) {
-    document.getElementById("message-status").textContent =
-      "Du måste vara inloggad.";
+  if (!roomId) {
+    document.getElementById("room-name").textContent = "Inget chattrum valt.";
     return;
   }
 
-  const { error } = await supabaseClient
-    .from("messages")
-    .insert({
-      room_id: Number(roomId),
-      user_id: user.id,
-      content: content
-    });
+  const { data, error } = await supabaseClient
+    .from("rooms")
+    .select("name, description")
+    .eq("id", roomId)
+    .single();
 
-  if (error) {
-    document.getElementById("message-status").textContent =
-      "Fel: " + error.message;
+  if (error || !data) {
+    document.getElementById("room-name").textContent = "Kunde inte hitta chattrummet.";
     return;
   }
 
-  input.value = "";
-  document.getElementById("message-status").textContent = "";
-  await loadMessages();
+  document.getElementById("room-name").textContent = data.name;
+  document.getElementById("room-description").textContent = data.description || "";
 }
 
-document.getElementById("send-button").addEventListener("click", sendMessage);
+async function loadMessages() {
   const roomId = new URLSearchParams(window.location.search).get("room");
   const messagesList = document.getElementById("messages");
 
@@ -123,37 +81,75 @@ document.getElementById("send-button").addEventListener("click", sendMessage);
     messagesList.textContent = "Inga meddelanden ännu. Skriv det första!";
     return;
   }
-const userIds = [...new Set(data.map(message => message.user_id))];
 
-const { data: profiles, error: profileError } = await supabaseClient
-  .from("profiles")
-  .select("user_id, username")
-  .in("user_id", userIds);
+  const userIds = [...new Set(data.map(message => message.user_id))];
 
-if (profileError) {
-  messagesList.textContent = "Kunde inte ladda användarnamn.";
-  return;
+  const { data: profiles, error: profileError } = await supabaseClient
+    .from("profiles")
+    .select("user_id, username")
+    .in("user_id", userIds);
+
+  if (profileError) {
+    messagesList.textContent = "Kunde inte ladda användarnamn.";
+    return;
+  }
+
+  data.forEach(message => {
+    const item = document.createElement("div");
+    item.className = "message-bubble";
+
+    const profile = profiles.find(p => p.user_id === message.user_id);
+
+    const username = document.createElement("strong");
+    username.textContent = profile ? "@" + profile.username : "Anonym";
+    username.style.display = "block";
+    username.style.marginBottom = "5px";
+
+    const content = document.createElement("div");
+    content.textContent = message.content;
+
+    item.appendChild(username);
+    item.appendChild(content);
+    messagesList.appendChild(item);
+  });
 }
- data.forEach(message => {
-  const item = document.createElement("div");
-  item.className = "message-bubble";
 
-  const profile = profiles.find(p => p.user_id === message.user_id);
+async function sendMessage() {
+  const roomId = new URLSearchParams(window.location.search).get("room");
+  const input = document.getElementById("message-input");
+  const content = input.value.trim();
 
-  const username = document.createElement("strong");
-  username.textContent = profile ? "@" + profile.username : "Anonym";
-  username.style.display = "block";
-  username.style.marginBottom = "5px";
+  if (!content) return;
 
-  const content = document.createElement("div");
-  content.textContent = message.content;
+  const { data: { user } } = await supabaseClient.auth.getUser();
 
-  item.appendChild(username);
-  item.appendChild(content);
-  messagesList.appendChild(item);
-});
+  if (!user) {
+    document.getElementById("message-status").textContent = "Du måste vara inloggad.";
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from("messages")
+    .insert({
+      room_id: Number(roomId),
+      user_id: user.id,
+      content: content
+    });
+
+  if (error) {
+    document.getElementById("message-status").textContent = "Fel: " + error.message;
+    return;
+  }
+
+  input.value = "";
+  document.getElementById("message-status").textContent = "";
+  await loadMessages();
+}
+
+document.getElementById("send-button").addEventListener("click", sendMessage);
+
+loadRoom();
 loadMessages();
 </script>
-
 </body>
 </html>
