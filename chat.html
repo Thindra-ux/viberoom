@@ -123,15 +123,35 @@ document.getElementById("send-button").addEventListener("click", sendMessage);
     messagesList.textContent = "Inga meddelanden ännu. Skriv det första!";
     return;
   }
+const userIds = [...new Set(data.map(message => message.user_id))];
 
-  data.forEach(message => {
-    const item = document.createElement("div");
-item.className = "message-bubble";
-item.textContent = message.content;
-    messagesList.appendChild(item);
-  });
+const { data: profiles, error: profileError } = await supabaseClient
+  .from("profiles")
+  .select("user_id, username")
+  .in("user_id", userIds);
+
+if (profileError) {
+  messagesList.textContent = "Kunde inte ladda användarnamn.";
+  return;
 }
+ data.forEach(message => {
+  const item = document.createElement("div");
+  item.className = "message-bubble";
 
+  const profile = profiles.find(p => p.user_id === message.user_id);
+
+  const username = document.createElement("strong");
+  username.textContent = profile ? "@" + profile.username : "Anonym";
+  username.style.display = "block";
+  username.style.marginBottom = "5px";
+
+  const content = document.createElement("div");
+  content.textContent = message.content;
+
+  item.appendChild(username);
+  item.appendChild(content);
+  messagesList.appendChild(item);
+});
 loadMessages();
 </script>
 
