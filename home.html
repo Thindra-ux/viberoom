@@ -138,9 +138,6 @@ alert("Profilbilden har laddats upp!");
 
   if (!user) {
     window.location.href = "index.html";
-    return;
-  }
-
   const { data, error } = await supabaseClient
     .from("profiles")
     .select("username, avatar_url")
