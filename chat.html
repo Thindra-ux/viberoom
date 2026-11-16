@@ -25,5 +25,43 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+<script>
+  const SUPABASE_URL = "https://dmuomeeuriqlayyuwrim.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_MSdBBcMSPa8a6g3cTPFEWw_uUOOeigD";
+
+  const supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
+
+  async function loadRoom() {
+    const roomId = new URLSearchParams(window.location.search).get("room");
+
+    if (!roomId) {
+      document.getElementById("room-name").textContent =
+        "Inget chattrum valt.";
+      return;
+    }
+
+    const { data, error } = await supabaseClient
+      .from("rooms")
+      .select("name, description")
+      .eq("id", roomId)
+      .single();
+
+    if (error || !data) {
+      document.getElementById("room-name").textContent =
+        "Kunde inte hitta chattrummet.";
+      return;
+    }
+
+    document.getElementById("room-name").textContent = data.name;
+    document.getElementById("room-description").textContent =
+      data.description || "";
+  }
+
+  loadRoom();
+</script>
+
 </body>
 </html>
