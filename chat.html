@@ -65,6 +65,37 @@
   }
 
   loadRoom();
+  
+async function loadMessages() {
+  const roomId = new URLSearchParams(window.location.search).get("room");
+  const messagesList = document.getElementById("messages");
+
+  const { data, error } = await supabaseClient
+    .from("messages")
+    .select("content, created_at")
+    .eq("room_id", roomId)
+    .order("created_at", { ascending: true });
+
+  if (error) {
+    messagesList.textContent = "Kunde inte ladda meddelanden.";
+    return;
+  }
+
+  messagesList.innerHTML = "";
+
+  if (!data || data.length === 0) {
+    messagesList.textContent = "Inga meddelanden ännu. Skriv det första!";
+    return;
+  }
+
+  data.forEach(message => {
+    const item = document.createElement("p");
+    item.textContent = message.content;
+    messagesList.appendChild(item);
+  });
+}
+
+loadMessages();
 </script>
 
 </body>
