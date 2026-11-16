@@ -125,8 +125,9 @@ document.getElementById("send-button").addEventListener("click", sendMessage);
   }
 
   data.forEach(message => {
-    const item = document.createElement("p");
-    item.textContent = message.content;
+    const item = document.createElement("div");
+item.className = "message-bubble";
+item.textContent = message.content;
     messagesList.appendChild(item);
   });
 }
