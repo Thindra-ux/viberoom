@@ -124,6 +124,7 @@ async function sendMessage() {
   const { data: { user } } = await supabaseClient.auth.getUser();
 
   if (!user) {
+    console.log("Inloggat användar-ID:", user.id);
     document.getElementById("message-status").textContent = "Du måste vara inloggad.";
     return;
   }
