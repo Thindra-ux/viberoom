@@ -117,7 +117,7 @@ async function loadRooms() {
 
   data.forEach(room => {
     const item = document.createElement("div");
-    item.textContent = room.name + " – " + (room.description || "");
+   item.innerHTML = `<a href="chat.html?room=${room.id}">${room.name}</a> – ${room.description || ""}`;
     list.appendChild(item);
   });
 }
