@@ -5,43 +5,299 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VibeRoom – Chatt</title>
-  <link rel="stylesheet" href="style.css">
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #130f14;
+      color: white;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .topbar {
+      height: 58px;
+      background: #211720;
+      border-bottom: 1px solid #493443;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+    }
+
+    .logo {
+      font-size: 25px;
+      font-weight: bold;
+      color: #f5a5d0;
+      letter-spacing: 1px;
+    }
+
+    .topbar a {
+      color: white;
+      text-decoration: none;
+    }
+
+    .layout {
+      display: flex;
+      height: calc(100vh - 58px);
+    }
+
+    .sidebar {
+      width: 62px;
+      background: #211820;
+      border-right: 1px solid #493443;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 25px;
+      padding-top: 24px;
+    }
+
+    .sidebar a {
+      color: #e9c8dc;
+      font-size: 23px;
+      text-decoration: none;
+    }
+
+    .chat-area {
+      display: flex;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .chat-main {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      background:
+        radial-gradient(ellipse at 70% 20%, #4a2637 0%, transparent 50%),
+        linear-gradient(135deg, #241820, #171319);
+    }
+
+    .room-header {
+      padding: 18px 22px;
+      border-bottom: 1px solid #493443;
+      background: #241a23;
+    }
+
+    .room-header h2 {
+      margin: 0 0 5px;
+      color: #f5a5d0;
+    }
+
+    .room-header p {
+      margin: 0;
+      color: #c9b9c5;
+      font-size: 13px;
+    }
+
+    #messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    .message-bubble {
+      background: rgba(65, 43, 59, 0.85);
+      border: 1px solid #54394e;
+      border-radius: 12px;
+      padding: 12px 15px;
+      margin-bottom: 13px;
+      max-width: 85%;
+      overflow-wrap: anywhere;
+    }
+
+    .message-bubble strong {
+      color: #f5a5d0;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .message-input-area {
+      display: flex;
+      gap: 10px;
+      padding: 13px;
+      border-top: 1px solid #493443;
+      background: #241a23;
+    }
+
+    #message-input {
+      flex: 1;
+      min-width: 0;
+      border: 1px solid #70465f;
+      background: #171319;
+      color: white;
+      border-radius: 25px;
+      padding: 13px 17px;
+      outline: none;
+    }
+
+    #message-input:focus {
+      border-color: #f5a5d0;
+    }
+
+    #send-button {
+      border: none;
+      border-radius: 25px;
+      padding: 0 22px;
+      background: #e77db7;
+      color: #21131d;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    #send-button:disabled {
+      opacity: 0.5;
+      cursor: wait;
+    }
+
+    #message-status {
+      padding: 0 15px 8px;
+      color: #f5a5d0;
+      font-size: 12px;
+      background: #241a23;
+    }
+
+    .right-panel {
+      width: 230px;
+      flex-shrink: 0;
+      background: #211820;
+      border-left: 1px solid #493443;
+      padding: 18px 13px;
+    }
+
+    .right-panel h3 {
+      text-align: center;
+      color: #f5a5d0;
+      margin: 0 0 18px;
+    }
+
+    .online-user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 9px;
+      background: #302330;
+      border-radius: 10px;
+      margin-bottom: 10px;
+    }
+
+    .avatar {
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      background: #e77db7;
+      display: grid;
+      place-items: center;
+      color: #251622;
+      font-weight: bold;
+    }
+
+    .online-dot {
+      width: 8px;
+      height: 8px;
+      background: #65d68b;
+      border-radius: 50%;
+      margin-left: auto;
+    }
+
+    .profile-name {
+      font-size: 13px;
+      overflow-wrap: anywhere;
+    }
+
+    @media (max-width: 700px) {
+      .right-panel { display: none; }
+      .sidebar { width: 48px; }
+      .logo { font-size: 21px; }
+      .message-bubble { max-width: 95%; }
+    }
+  </style>
 </head>
+
 <body>
 
-  <header class="topbar">
-    <h1>VibeRoom</h1>
-    <a href="home.html">Tillbaka</a>
-  </header>
+<header class="topbar">
+  <div class="logo">✦ VibeRoom</div>
+  <a href="home.html">Tillbaka till startsidan</a>
+</header>
 
-  <main class="section">
-    <h2 id="room-name">Laddar chattrum...</h2>
-    <p id="room-description"></p>
+<div class="layout">
 
-    <div class="auth-box">
-     <div id="messages">Laddar meddelanden...</div>
+  <nav class="sidebar">
+    <a href="home.html" title="Hem">⌂</a>
+    <a href="home.html" title="Chattrum">▣</a>
+    <a href="home.html" title="Profiler">♙</a>
+    <a href="home.html" title="Inställningar">⚙</a>
+  </nav>
 
-<input id="message-input" type="text" placeholder="Skriv ett meddelande...">
-<button id="send-button">Skicka</button>
-<p id="message-status"></p>
-    </div>
-  </main>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <div class="chat-area">
+
+    <main class="chat-main">
+
+      <div class="room-header">
+        <h2 id="room-name">Laddar chattrum...</h2>
+        <p id="room-description"></p>
+      </div>
+
+      <div id="messages">Laddar meddelanden...</div>
+
+      <div class="message-input-area">
+        <input
+          id="message-input"
+          type="text"
+          placeholder="Skriv ett meddelande..."
+          autocomplete="off"
+        >
+        <button id="send-button">Skicka ➤</button>
+      </div>
+
+      <p id="message-status"></p>
+
+    </main>
+
+    <aside class="right-panel">
+      <h3>Online</h3>
+
+      <div class="online-user">
+        <div class="avatar" id="user-avatar">?</div>
+        <span class="profile-name" id="online-name">Laddar...</span>
+        <span class="online-dot"></span>
+      </div>
+
+      <p style="color:#bdaaba;font-size:12px;text-align:center;">
+        Du är inloggad i VibeRoom
+      </p>
+    </aside>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-const SUPABASE_URL = "https://dmuomeeuriqlayyuwrim.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_MSdBBcMSPa8a6g3cTPFEWw_uUOOeigD";
+const SUPABASE_URL =
+  "https://dmuomeeuriqlayyuwrim.supabase.co";
+
+const SUPABASE_ANON_KEY =
+  "sb_publishable_MSdBBcMSPa8a6g3cTPFEWw_uUOOeigD";
 
 const supabaseClient = window.supabase.createClient(
   SUPABASE_URL,
   SUPABASE_ANON_KEY
 );
 
-async function loadRoom() {
-  const roomId = new URLSearchParams(window.location.search).get("room");
+const roomId = new URLSearchParams(
+  window.location.search
+).get("room");
 
+async function loadRoom() {
   if (!roomId) {
-    document.getElementById("room-name").textContent = "Inget chattrum valt.";
+    document.getElementById("room-name").textContent =
+      "Inget chattrum valt.";
     return;
   }
 
@@ -52,20 +308,44 @@ async function loadRoom() {
     .single();
 
   if (error || !data) {
-    document.getElementById("room-name").textContent = "Kunde inte hitta chattrummet.";
+    document.getElementById("room-name").textContent =
+      "Kunde inte hitta chattrummet.";
     return;
   }
 
-  document.getElementById("room-name").textContent = data.name;
-  document.getElementById("room-description").textContent = data.description || "";
+  document.getElementById("room-name").textContent =
+    data.name;
+
+  document.getElementById("room-description").textContent =
+    data.description || "";
+}
+
+async function loadProfile() {
+  const { data: { user } } =
+    await supabaseClient.auth.getUser();
+
+  if (!user) {
+    document.getElementById("online-name").textContent =
+      "Inte inloggad";
+    return;
+  }
+
+  const { data } = await supabaseClient
+    .from("profiles")
+    .select("username")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  const username = data?.username || "Medlem";
+
+  document.getElementById("online-name").textContent =
+    "@" + username;
+
+  document.getElementById("user-avatar").textContent =
+    username.charAt(0).toUpperCase();
 }
 
 async function loadMessages() {
- const { data: authData } = await supabaseClient.auth.getUser();
-console.log("Inloggad användare:", authData.user);
-  const { data: { user } } = await supabaseClient.auth.getUser();
-console.log("Inloggad användare:", user);
-  const roomId = new URLSearchParams(window.location.search).get("room");
   const messagesList = document.getElementById("messages");
 
   const { data, error } = await supabaseClient
@@ -75,39 +355,47 @@ console.log("Inloggad användare:", user);
     .order("created_at", { ascending: true });
 
   if (error) {
-    messagesList.textContent = "Kunde inte ladda meddelanden.";
+    messagesList.textContent =
+      "Kunde inte ladda meddelanden: " + error.message;
     return;
   }
 
   messagesList.innerHTML = "";
 
   if (!data || data.length === 0) {
-    messagesList.textContent = "Inga meddelanden ännu. Skriv det första!";
+    messagesList.textContent =
+      "Inga meddelanden ännu. Skriv det första!";
     return;
   }
 
-  const userIds = [...new Set(data.map(message => message.user_id))];
+  const userIds = [...new Set(
+    data.map(message => message.user_id)
+  )];
 
-  const { data: profiles, error: profileError } = await supabaseClient
-    .from("profiles")
-    .select("user_id, username")
-    .in("user_id", userIds);
+  const { data: profiles, error: profileError } =
+    await supabaseClient
+      .from("profiles")
+      .select("user_id, username")
+      .in("user_id", userIds);
 
   if (profileError) {
-    messagesList.textContent = "Kunde inte ladda användarnamn.";
+    messagesList.textContent =
+      "Kunde inte ladda användarnamn.";
     return;
   }
 
   data.forEach(message => {
+    const profile = profiles.find(
+      p => p.user_id === message.user_id
+    );
+
     const item = document.createElement("div");
     item.className = "message-bubble";
 
-    const profile = profiles.find(p => p.user_id === message.user_id);
-
     const username = document.createElement("strong");
-    username.textContent = profile ? "@" + profile.username : "Anonym";
-    username.style.display = "block";
-    username.style.marginBottom = "5px";
+    username.textContent = profile
+      ? "@" + profile.username
+      : "Anonym";
 
     const content = document.createElement("div");
     content.textContent = message.content;
@@ -116,21 +404,27 @@ console.log("Inloggad användare:", user);
     item.appendChild(content);
     messagesList.appendChild(item);
   });
+
+  messagesList.scrollTop = messagesList.scrollHeight;
 }
 
 async function sendMessage() {
-  console.log("Skicka-funktionen startar!");
-  const roomId = new URLSearchParams(window.location.search).get("room");
   const input = document.getElementById("message-input");
+  const status = document.getElementById("message-status");
+  const button = document.getElementById("send-button");
   const content = input.value.trim();
 
   if (!content) return;
 
+  const { data: { user } } =
+    await supabaseClient.auth.getUser();
+
   if (!user) {
-    console.log("Inloggat användar-ID:", user.id);
-    document.getElementById("message-status").textContent = "Du måste vara inloggad.";
+    status.textContent = "Du måste vara inloggad.";
     return;
   }
+
+  button.disabled = true;
 
   const { error } = await supabaseClient
     .from("messages")
@@ -140,59 +434,45 @@ async function sendMessage() {
       content: content
     });
 
+  button.disabled = false;
+
   if (error) {
-    document.getElementById("message-status").textContent = "Fel: " + error.message;
+    status.textContent = "Fel: " + error.message;
     return;
   }
 
   input.value = "";
-  document.getElementById("message-status").textContent = "";
+  status.textContent = "";
+  input.focus();
+
   await loadMessages();
 }
-async function sendMessage() {
-  const roomId = new URLSearchParams(window.location.search).get("room");
-  const input = document.getElementById("message-input");
-  const content = input.value.trim();
 
-  if (!content) return;
+document
+  .getElementById("send-button")
+  .addEventListener("click", sendMessage);
 
-  const { data: { user } } = await supabaseClient.auth.getUser();
-
-  if (!user) {
-    document.getElementById("message-status").textContent = "Du måste vara inloggad.";
-    return;
-  }
-
-  const { error } = await supabaseClient
-    .from("messages")
-    .insert({
-      room_id: Number(roomId),
-      user_id: user.id,
-      content: content
-    });
-
-  if (error) {
-    document.getElementById("message-status").textContent = "Fel: " + error.message;
-    return;
-  }
-
-  input.value = "";
-  document.getElementById("message-status").textContent = "";
-  await loadMessages();
-}
-document.getElementById("send-button").addEventListener("click", sendMessage);
+document
+  .getElementById("message-input")
+  .addEventListener("keydown", event => {
+    if (event.key === "Enter") {
+      sendMessage();
+    }
+  });
 
 loadRoom();
+loadProfile();
 loadMessages();
-  supabaseClient
-  .channel("room-messages")
+
+supabaseClient
+  .channel("room-messages-" + roomId)
   .on(
     "postgres_changes",
     {
       event: "INSERT",
       schema: "public",
       table: "messages",
-      filter: "room_id=eq.1"
+      filter: "room_id=eq." + roomId
     },
     () => {
       loadMessages();
@@ -200,5 +480,6 @@ loadMessages();
   )
   .subscribe();
 </script>
+
 </body>
 </html>
