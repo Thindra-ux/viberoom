@@ -340,19 +340,18 @@ async function loadProfile() {
     username.charAt(0).toUpperCase();
 }
  async function loadMessages() {
-  const messagesList = document.getElementById("messages");
+  const time = document.createElement("span");
+time.className = "message-time";
 
-  const { data, error } = await supabaseClient
-    .from("messages")
-    .select("content, created_at, user_id")
-    .eq("room_id", roomId)
-    .order("created_at", { ascending: true });
+const senderTimezone = profile?.timezone;
 
-  if (error) {
-    messagesList.textContent =
-      "Kunde inte ladda meddelanden: " + error.message;
-    return;
-  }
+time.textContent = new Date(
+  message.created_at
+).toLocaleTimeString("sv-SE", {
+  ...(senderTimezone ? { timeZone: senderTimezone } : {}),
+  hour: "2-digit",
+  minute: "2-digit"
+});
 
   messagesList.innerHTML = "";
 
