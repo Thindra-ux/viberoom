@@ -148,7 +148,37 @@ async function sendMessage() {
   document.getElementById("message-status").textContent = "";
   await loadMessages();
 }
+async function sendMessage() {
+  const roomId = new URLSearchParams(window.location.search).get("room");
+  const input = document.getElementById("message-input");
+  const content = input.value.trim();
 
+  if (!content) return;
+
+  const { data: { user } } = await supabaseClient.auth.getUser();
+
+  if (!user) {
+    document.getElementById("message-status").textContent = "Du måste vara inloggad.";
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from("messages")
+    .insert({
+      room_id: Number(roomId),
+      user_id: user.id,
+      content: content
+    });
+
+  if (error) {
+    document.getElementById("message-status").textContent = "Fel: " + error.message;
+    return;
+  }
+
+  input.value = "";
+  document.getElementById("message-status").textContent = "";
+  await loadMessages();
+}
 document.getElementById("send-button").addEventListener("click", sendMessage);
 
 loadRoom();
