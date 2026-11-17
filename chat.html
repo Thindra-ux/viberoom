@@ -372,26 +372,40 @@ async function loadMessages() {
   }
 
   data.forEach(message => {
-    const profile = profiles.find(
-      p => p.user_id === message.user_id
-    );
+  const profile = profiles.find(
+    p => p.user_id === message.user_id
+  );
 
-    const item = document.createElement("div");
-    item.className = "message-bubble";
+  const item = document.createElement("div");
+  item.className = "message-bubble";
 
-    const username = document.createElement("strong");
-    username.textContent = profile
-      ? "@" + profile.username
-      : "Anonym";
+  const meta = document.createElement("div");
+  meta.className = "message-meta";
 
-    const content = document.createElement("div");
-    content.textContent = message.content;
+  const username = document.createElement("strong");
+  username.textContent = profile
+    ? "@" + profile.username
+    : "Anonym";
 
-    item.appendChild(username);
-    item.appendChild(content);
-    messagesList.appendChild(item);
+  const time = document.createElement("span");
+  time.className = "message-time";
+  time.textContent = new Date(
+    message.created_at
+  ).toLocaleTimeString("sv-SE", {
+    hour: "2-digit",
+    minute: "2-digit"
   });
 
+  const content = document.createElement("div");
+  content.textContent = message.content;
+
+  meta.appendChild(username);
+  meta.appendChild(time);
+  item.appendChild(meta);
+  item.appendChild(content);
+
+  messagesList.appendChild(item);
+});
   messagesList.scrollTop = messagesList.scrollHeight;
 }
 
