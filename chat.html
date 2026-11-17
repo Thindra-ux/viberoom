@@ -368,7 +368,7 @@ time.textContent = new Date(
   const { data: profiles, error: profileError } =
     await supabaseClient
       .from("profiles")
-     .select("user_id, username, timezone")
+    .select("user_id, username, timezone, is_vip")
       .in("user_id", userIds);
 
   if (profileError) {
