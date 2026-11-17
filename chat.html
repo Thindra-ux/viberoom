@@ -369,7 +369,7 @@ async function loadProfile() {
   const { data: profiles, error: profileError } =
     await supabaseClient
       .from("profiles")
-      .select("user_id, username")
+     .select("user_id, username, timezone")
       .in("user_id", userIds);
 
   if (profileError) {
