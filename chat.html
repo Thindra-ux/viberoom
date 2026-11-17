@@ -119,6 +119,7 @@ console.log("Inloggad användare:", user);
 }
 
 async function sendMessage() {
+  console.log("Skicka-funktionen startar!");
   const roomId = new URLSearchParams(window.location.search).get("room");
   const input = document.getElementById("message-input");
   const content = input.value.trim();
