@@ -317,7 +317,27 @@ async function loadRoom() {
   document.getElementById("room-description").textContent =
     data.description || "";
 }
+async function checkFounder() {
+  const { data: { user } } =
+    await supabaseClient.auth.getUser();
 
+  if (!user) return;
+
+  const { data, error } = await supabaseClient
+    .from("founders")
+    .select("user_id")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (error) {
+    console.error("Kunde inte kontrollera grundare:", error);
+    return;
+  }
+
+  if (data) {
+    document.getElementById("founder-panel").style.display = "block";
+  }
+}
 async function loadProfile() {
   const { data: { user } } =
     await supabaseClient.auth.getUser();
@@ -351,18 +371,19 @@ async function loadProfile() {
     username.charAt(0).toUpperCase();
 }
  async function loadMessages() {
-  const username = document.createElement("strong");
+  const messagesList = document.getElementById("messages");
 
-username.textContent = profile
-  ? "@" + profile.username + (profile.is_vip ? " 💎" : "")
-  : "Anonym";
-time.textContent = new Date(
-  message.created_at
-).toLocaleTimeString("sv-SE", {
-  ...(senderTimezone ? { timeZone: senderTimezone } : {}),
-  hour: "2-digit",
-  minute: "2-digit"
-});
+  const { data, error } = await supabaseClient
+    .from("messages")
+    .select("content, created_at, user_id")
+    .eq("room_id", roomId)
+    .order("created_at", { ascending: true });
+
+  if (error) {
+    messagesList.textContent =
+      "Kunde inte ladda meddelanden: " + error.message;
+    return;
+  }
 
   messagesList.innerHTML = "";
 
@@ -379,7 +400,7 @@ time.textContent = new Date(
   const { data: profiles, error: profileError } =
     await supabaseClient
       .from("profiles")
-    .select("user_id, username, timezone, is_vip")
+      .select("user_id, username, timezone, is_vip")
       .in("user_id", userIds);
 
   if (profileError) {
@@ -389,40 +410,45 @@ time.textContent = new Date(
   }
 
   data.forEach(message => {
-  const profile = profiles.find(
-    p => p.user_id === message.user_id
-  );
+    const profile = profiles.find(
+      p => p.user_id === message.user_id
+    );
 
-  const item = document.createElement("div");
-  item.className = "message-bubble";
+    const item = document.createElement("div");
+    item.className = "message-bubble";
 
-  const meta = document.createElement("div");
-  meta.className = "message-meta";
+    const meta = document.createElement("div");
+    meta.className = "message-meta";
 
-  const username = document.createElement("strong");
-  username.textContent = profile
-    ? "@" + profile.username
-    : "Anonym";
+    const username = document.createElement("strong");
+    username.textContent = profile
+      ? "@" + profile.username + (profile.is_vip ? " 💎" : "")
+      : "Anonym";
 
-  const time = document.createElement("span");
-  time.className = "message-time";
-  time.textContent = new Date(
-    message.created_at
-  ).toLocaleTimeString("sv-SE", {
-    hour: "2-digit",
-    minute: "2-digit"
+    const time = document.createElement("span");
+    time.className = "message-time";
+
+    const senderTimezone = profile?.timezone;
+
+    time.textContent = new Date(
+      message.created_at
+    ).toLocaleTimeString("sv-SE", {
+      ...(senderTimezone ? { timeZone: senderTimezone } : {}),
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+
+    const content = document.createElement("div");
+    content.textContent = message.content;
+
+    meta.appendChild(username);
+    meta.appendChild(time);
+    item.appendChild(meta);
+    item.appendChild(content);
+
+    messagesList.appendChild(item);
   });
 
-  const content = document.createElement("div");
-  content.textContent = message.content;
-
-  meta.appendChild(username);
-  meta.appendChild(time);
-  item.appendChild(meta);
-  item.appendChild(content);
-
-  messagesList.appendChild(item);
-});
   messagesList.scrollTop = messagesList.scrollHeight;
 }
 
