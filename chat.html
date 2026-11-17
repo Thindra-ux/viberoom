@@ -61,8 +61,8 @@ async function loadRoom() {
 }
 
 async function loadMessages() {
-  const { data: { user } } = await supabaseClient.auth.getUser();
-console.log("Inloggad användare:", user);
+ const { data: authData } = await supabaseClient.auth.getUser();
+console.log("Inloggad användare:", authData.user);
   const { data: { user } } = await supabaseClient.auth.getUser();
 console.log("Inloggad användare:", user);
   const roomId = new URLSearchParams(window.location.search).get("room");
