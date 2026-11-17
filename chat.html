@@ -317,6 +317,14 @@ async function loadProfile() {
     return;
   }
 
+  const timezone =
+    Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+  await supabaseClient
+    .from("profiles")
+    .update({ timezone })
+    .eq("user_id", user.id);
+
   const { data } = await supabaseClient
     .from("profiles")
     .select("username")
@@ -331,8 +339,7 @@ async function loadProfile() {
   document.getElementById("user-avatar").textContent =
     username.charAt(0).toUpperCase();
 }
-
-async function loadMessages() {
+ async function loadMessages() {
   const messagesList = document.getElementById("messages");
 
   const { data, error } = await supabaseClient
