@@ -340,11 +340,11 @@ async function loadProfile() {
     username.charAt(0).toUpperCase();
 }
  async function loadMessages() {
-  const time = document.createElement("span");
-time.className = "message-time";
+  const username = document.createElement("strong");
 
-const senderTimezone = profile?.timezone;
-
+username.textContent = profile
+  ? "@" + profile.username + (profile.is_vip ? " 💎" : "")
+  : "Anonym";
 time.textContent = new Date(
   message.created_at
 ).toLocaleTimeString("sv-SE", {
