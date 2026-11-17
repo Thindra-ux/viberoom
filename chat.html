@@ -507,6 +507,7 @@ document
 loadRoom();
 loadProfile();
 loadMessages();
+checkFounder();
 
 supabaseClient
   .channel("room-messages-" + roomId)
