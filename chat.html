@@ -428,9 +428,6 @@ async function loadMemberGroups() {
       adminList.appendChild(name);
       return;
     }
-
-    const lastSeen = presence.get(profile.user_id);
-    const isOnline = lastSeen && now - lastSeen < 90000;
     const lastSeen = presence.get(profile.user_id);
     const isOnline =
       lastSeen && now - lastSeen < 90000;
