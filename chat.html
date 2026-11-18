@@ -455,29 +455,6 @@ async function loadMemberGroups() {
     offlineList.textContent = "Ingen offline";
   }
 }
-  const now = Date.now();
-
-  profilesResult.data.forEach(profile => {
-    const name = document.createElement("div");
-    name.className = "online-user";
-
-    const avatar = document.createElement("div");
-    avatar.className = "avatar";
-    avatar.textContent =
-      (profile.username || "?").charAt(0).toUpperCase();
-
-    const username = document.createElement("span");
-    username.className = "profile-name";
-    username.textContent = "@" + (profile.username || "Medlem");
-
-    name.appendChild(avatar);
-    name.appendChild(username);
-
-    if (adminIds.has(profile.user_id)) {
-      adminList.appendChild(name);
-      return;
-    }
-
     const lastSeen = presence.get(profile.user_id);
     const isOnline =
       lastSeen && now - lastSeen < 90000;
@@ -504,6 +481,7 @@ async function loadMemberGroups() {
   if (!offlineList.children.length) {
     offlineList.textContent = "Ingen offline";
   }
+}
 async function loadProfile() {
   const { data: { user } } =
     await supabaseClient.auth.getUser();
