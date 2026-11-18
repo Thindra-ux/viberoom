@@ -341,6 +341,170 @@ async function checkFounder() {
     document.getElementById("founder-panel").style.display = "block";
   }
 }
+
+  async function updateMyPresence() {
+  const { data: { user } } =
+    await supabaseClient.auth.getUser();
+
+  if (!user) return;
+
+  const { error } = await supabaseClient
+    .from("user_presence")
+    .upsert({
+      user_id: user.id,
+      last_seen: new Date().toISOString()
+    });
+
+  if (error) {
+    console.error("Presence-fel:", error);
+  }
+}
+
+async function loadMemberGroups() {
+  await updateMyPresence();
+
+  const adminList = document.getElementById("admin-list");
+  const onlineList = document.getElementById("online-list");
+  const offlineList = document.getElementById("offline-list");
+
+  const [profilesResult, adminsResult, presenceResult] =
+    await Promise.all([
+      supabaseClient.from("profiles")
+        .select("user_id, username"),
+
+      supabaseClient.from("admins")
+        .select("user_id"),
+
+      supabaseClient.from("user_presence")
+        .select("user_id, last_seen")
+    ]);
+
+  if (profilesResult.error || adminsResult.error ||
+      presenceResult.error) {
+    adminList.textContent = "Kunde inte ladda medlemmar.";
+    onlineList.textContent = "Kontrollera databasen.";
+    offlineList.textContent = "";
+    console.error(
+      profilesResult.error,
+      adminsResult.error,
+      presenceResult.error
+    );
+    return;
+  }
+
+  adminList.innerHTML = "";
+  onlineList.innerHTML = "";
+  offlineList.innerHTML = "";
+
+  const adminIds = new Set(
+    adminsResult.data.map(admin => admin.user_id)
+  );
+
+  const presence = new Map(
+    presenceResult.data.map(item => [
+      item.user_id,
+      new Date(item.last_seen).getTime()
+    ])
+  );
+  const now = Date.now();
+
+  profilesResult.data.forEach(profile => {
+    const name = document.createElement("div");
+    name.className = "online-user";
+
+    const avatar = document.createElement("div");
+    avatar.className = "avatar";
+    avatar.textContent =
+      (profile.username || "?").charAt(0).toUpperCase();
+
+    const username = document.createElement("span");
+    username.className = "profile-name";
+    username.textContent = "@" + (profile.username || "Medlem");
+
+    name.appendChild(avatar);
+    name.appendChild(username);
+
+    if (adminIds.has(profile.user_id)) {
+      adminList.appendChild(name);
+      return;
+    }
+
+    const lastSeen = presence.get(profile.user_id);
+    const isOnline = lastSeen && now - lastSeen < 90000;
+
+    const dot = document.createElement("span");
+    dot.className = "online-dot";
+
+    if (isOnline) {
+      name.appendChild(dot);
+      onlineList.appendChild(name);
+    } else {
+      dot.style.background = "#888";
+      name.appendChild(dot);
+      offlineList.appendChild(name);
+    }
+  });
+
+  if (!adminList.children.length) {
+    adminList.textContent = "Inga admins";
+  }
+  if (!onlineList.children.length) {
+    onlineList.textContent = "Ingen online";
+  }
+  if (!offlineList.children.length) {
+    offlineList.textContent = "Ingen offline";
+  }
+}
+  const now = Date.now();
+
+  profilesResult.data.forEach(profile => {
+    const name = document.createElement("div");
+    name.className = "online-user";
+
+    const avatar = document.createElement("div");
+    avatar.className = "avatar";
+    avatar.textContent =
+      (profile.username || "?").charAt(0).toUpperCase();
+
+    const username = document.createElement("span");
+    username.className = "profile-name";
+    username.textContent = "@" + (profile.username || "Medlem");
+
+    name.appendChild(avatar);
+    name.appendChild(username);
+
+    if (adminIds.has(profile.user_id)) {
+      adminList.appendChild(name);
+      return;
+    }
+
+    const lastSeen = presence.get(profile.user_id);
+    const isOnline =
+      lastSeen && now - lastSeen < 90000;
+
+    const dot = document.createElement("span");
+    dot.className = "online-dot";
+
+    if (isOnline) {
+      name.appendChild(dot);
+      onlineList.appendChild(name);
+    } else {
+      dot.style.background = "#888";
+      name.appendChild(dot);
+      offlineList.appendChild(name);
+    }
+  });
+
+  if (!adminList.children.length) {
+    adminList.textContent = "Inga admins";
+  }
+  if (!onlineList.children.length) {
+    onlineList.textContent = "Ingen online";
+  }
+  if (!offlineList.children.length) {
+    offlineList.textContent = "Ingen offline";
+  }
+}
 async function loadProfile() {
   const { data: { user } } =
     await supabaseClient.auth.getUser();
@@ -511,7 +675,8 @@ loadRoom();
 loadProfile();
 loadMessages();
 checkFounder();
-
+loadMemberGroups();
+setInterval(loadMemberGroups, 20000);
 supabaseClient
   .channel("room-messages-" + roomId)
   .on(
