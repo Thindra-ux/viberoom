@@ -431,30 +431,6 @@ async function loadMemberGroups() {
 
     const lastSeen = presence.get(profile.user_id);
     const isOnline = lastSeen && now - lastSeen < 90000;
-
-    const dot = document.createElement("span");
-    dot.className = "online-dot";
-
-    if (isOnline) {
-      name.appendChild(dot);
-      onlineList.appendChild(name);
-    } else {
-      dot.style.background = "#888";
-      name.appendChild(dot);
-      offlineList.appendChild(name);
-    }
-  });
-
-  if (!adminList.children.length) {
-    adminList.textContent = "Inga admins";
-  }
-  if (!onlineList.children.length) {
-    onlineList.textContent = "Ingen online";
-  }
-  if (!offlineList.children.length) {
-    offlineList.textContent = "Ingen offline";
-  }
-}
     const lastSeen = presence.get(profile.user_id);
     const isOnline =
       lastSeen && now - lastSeen < 90000;
@@ -476,6 +452,7 @@ async function loadMemberGroups() {
     adminList.textContent = "Inga admins";
   }
   if (!onlineList.children.length) {
+  
     onlineList.textContent = "Ingen online";
   }
   if (!offlineList.children.length) {
