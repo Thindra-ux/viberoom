@@ -504,7 +504,6 @@ async function loadMemberGroups() {
   if (!offlineList.children.length) {
     offlineList.textContent = "Ingen offline";
   }
-}
 async function loadProfile() {
   const { data: { user } } =
     await supabaseClient.auth.getUser();
